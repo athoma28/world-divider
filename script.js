@@ -177,43 +177,39 @@ async function setBirthLocation(point) {
         console.error('Gemini API error:', error);
     }
 }
-// This is your new function that calls the Netlify proxy
+// Instead of a direct Gemini URL, call your Netlify function URL:
+const NETLIFY_FUNCTION_URL = 'https://<your-site-name>.netlify.app/.netlify/functions/gemini-proxy';
+
+// Example fetch code in your script:
 async function fetchGeminiSnippet(city, country, distance) {
-  // The Netlify function endpoint:
-  // Replace <YOUR_NETLIFY_SUBDOMAIN> with your actual netlify subdomain
-  // or your custom domain if you set one up.
-  const NETLIFY_FUNCTION_URL = 'https://67b97cf17150630008a67994--worldsapart.netlify.app/.netlify/functions/gemini-proxy';
-
-  const requestBody = {
-    city: city,
-    country: country,
-    distance: distance
-  };
-
   try {
-    // POST to your Netlify function
     const response = await fetch(NETLIFY_FUNCTION_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      // 'mode': 'cors',  // you can specify if needed (usually default is 'cors').
+      body: JSON.stringify({ city, country, distance })
     });
 
-    const data = await response.json();
-
+    // If there's a CORS error, check the browser console for details
     if (!response.ok) {
-      // If there's a server-side error or Gemini error, log or handle it
-      console.error('Netlify function error:', data);
-      throw new Error(data.error || 'Failed to fetch snippet.');
+      console.error('Netlify function error. Status:', response.status);
+      const errData = await response.json();
+      console.error('Response body from Netlify:', errData);
+      throw new Error('Failed to fetch snippet.');
     }
 
-    // data.snippet is what we returned from the function
+    const data = await response.json();
+    console.log('Data from Netlify function:', data);
     return data.snippet;
 
   } catch (err) {
-    console.error('Error fetching snippet from Netlify function:', err);
+    console.error('Error fetching snippet:', err);
     throw err;
   }
 }
+
 
 
 // Clear map
