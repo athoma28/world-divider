@@ -1,0 +1,18 @@
+# netlify.toml
+
+[build]
+  # If you're purely using serverless functions
+  # and have no frontend build process (e.g., no React/Vue build),
+  # you can set the command to empty:
+  command = ""
+
+  # If you are deploying static files with Netlify (instead of GitHub Pages),
+  # set the publish directory to the folder that has your index.html, etc.
+  # publish = "dist"  # or "public" or whatever your folder is
+
+[functions]
+  directory = "netlify/functions"
+  # node_bundler = "esbuild"
+  #   ^ Sometimes needed if you're using ES Modules or certain Node versions.
+  #   Netlify typically uses esbuild by default now for Node 18+,
+  #   but you can uncomment it if you hit bundling issues.
