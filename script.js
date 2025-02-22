@@ -182,7 +182,7 @@ async function fetchGeminiSnippet(city, country, distance) {
   // The Netlify function endpoint:
   // Replace <YOUR_NETLIFY_SUBDOMAIN> with your actual netlify subdomain
   // or your custom domain if you set one up.
-  const NETLIFY_FUNCTION_URL = 'https://<YOUR_NETLIFY_SUBDOMAIN>.netlify.app/.netlify/functions/gemini-proxy';
+  const NETLIFY_FUNCTION_URL = 'https://67b97cf17150630008a67994--worldsapart.netlify.app/.netlify/functions/gemini-proxy';
 
   const requestBody = {
     city: city,
