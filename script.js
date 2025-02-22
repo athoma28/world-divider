@@ -177,115 +177,43 @@ async function setBirthLocation(point) {
         console.error('Gemini API error:', error);
     }
 }
-// Fetch snippet from Gemini API
+// This is your new function that calls the Netlify proxy
 async function fetchGeminiSnippet(city, country, distance) {
-  const apiKey = 'AIzaSyD0WCfC9Ktlr4tKmuAwM4YyCLjkqe8F09A'; // Replace with your own valid API key
+  // The Netlify function endpoint:
+  // Replace <YOUR_NETLIFY_SUBDOMAIN> with your actual netlify subdomain
+  // or your custom domain if you set one up.
+  const NETLIFY_FUNCTION_URL = 'https://<YOUR_NETLIFY_SUBDOMAIN>.netlify.app/.netlify/functions/gemini-proxy';
 
-  // The system instruction to guide the model’s behavior
-  const systemInstructionText = `
-You are given a city name, a country name, distance in kilometers from the center of the city, an adjective, and a date. Write 3-5 sentences, in the second person, explaining the life, from birth to (maybe) death, of a person who grew up there in the last 60 years. Include specific memories and highs and lows of the life, regardless of whether the person overall had a positive or negative life. Make the overall theme wistful. Write creatively and uniquely, and make the details direct, ordinary and realistic, not literary. It should not read like a storybook with a neat ending, nor should it sound like an advertisement. If there are lots of cities with that name in the given country, be generic.
-
-Do not restate the input number of kilometers exactly. Say things like pretty close to, or a long drive from, or not too far from, whatever - just make it sound natural.
-
-Example input: Shanghai, China, 3, positive, 1988
-
-Example output: You were born near the center of Shanghai in 1988. Your mother worked in a radio factory and your father owned a small shop selling and repairing watches. At the age of 14, you finally beat your older cousin in ping-pong while your crush was watching. You got married in 2010 and moved across the river to a fourth-floor apartment in an older building. You work for Huawei now and pick your daughter up from school on the way back from your office.
-`;
-
-  // Generate a random year between 1960 and 2005
-  const randomYear = Math.floor(Math.random() * (2005 - 1960 + 1)) + 1960;
-  const randomSentiment = Math.random() < 0.5 ? 'negative' : 'positive';
-
-  const userPrompt = `${city}, ${country}, ${distance}, ${randomSentiment}, ${randomYear}`;
-
-  console.log('fetchGeminiSnippet called with:', {
-    city,
-    country,
-    randomSentiment,
-    randomYear
-  });
-
-  // Construct the request body
   const requestBody = {
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          { text: userPrompt }
-        ]
-      },
-      {
-        role: 'user',
-        parts: [
-          { text: 'INSERT_INPUT_HERE' }
-        ]
-      }
-    ],
-    systemInstruction: {
-      role: 'user',
-      parts: [
-        {
-          text: systemInstructionText.trim()
-        }
-      ]
-    },
-    generationConfig: {
-      temperature: 1,
-      topK: 40,
-      topP: 0.95,
-      maxOutputTokens: 8192,
-      responseMimeType: 'text/plain'
-    }
+    city: city,
+    country: country,
+    distance: distance
   };
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
+  try {
+    // POST to your Netlify function
+    const response = await fetch(NETLIFY_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
 
-  console.log('Sending POST request to Gemini API:', url);
-  console.log('Request body:', requestBody);
+    const data = await response.json();
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(requestBody)
-  });
+    if (!response.ok) {
+      // If there's a server-side error or Gemini error, log or handle it
+      console.error('Netlify function error:', data);
+      throw new Error(data.error || 'Failed to fetch snippet.');
+    }
 
-  console.log('Gemini API response status:', response.status, response.statusText);
+    // data.snippet is what we returned from the function
+    return data.snippet;
 
-  // Parse the response as JSON
-  const data = await response.json();
-
-  // Debug: Print the entire raw JSON to the console
-  console.log('Raw response JSON from Gemini:', data);
-
-// Step-by-step parse of the JSON:
-const candidate = data.candidates?.[0];
-if (!candidate) {
-  throw new Error('No "candidates[0]" in Gemini response.');
+  } catch (err) {
+    console.error('Error fetching snippet from Netlify function:', err);
+    throw err;
+  }
 }
-
-// Note: content is NOT an array—it's an object.
-const contentObj = candidate.content;
-if (!contentObj) {
-  throw new Error('No "candidate.content" object in Gemini response.');
-}
-
-// Now "parts" should be an array inside that object.
-const partItem = contentObj.parts?.[0];
-if (!partItem) {
-  throw new Error('No "parts[0]" inside "candidate.content" in Gemini response.');
-}
-
-// Finally get text
-if (!partItem.text) {
-  throw new Error('No "text" property found in the first part.');
-}
-
-// Return the text
-return partItem.text;
-}
-
 
 
 // Clear map
