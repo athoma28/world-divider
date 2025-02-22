@@ -178,7 +178,7 @@ async function setBirthLocation(point) {
     }
 }
 // Instead of a direct Gemini URL, call your Netlify function URL:
-const NETLIFY_FUNCTION_URL = 'https://<your-site-name>.netlify.app/.netlify/functions/gemini-proxy';
+const NETLIFY_FUNCTION_URL = 'https://worldsapart.netlify.app/.netlify/functions/gemini-proxy';
 
 // Example fetch code in your script:
 async function fetchGeminiSnippet(city, country, distance) {
