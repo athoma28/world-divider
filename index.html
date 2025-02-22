@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worlds Apart</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Worlds Apart</h1>
+    </header>
+    <main>
+        <section id="map-container">
+            <div id="map"></div>
+            <div id="loading" class="overlay">Loading data...</div>
+        </section>
+        <section id="controls">
+            <button id="submitShape">Roll</button>
+            <button id="clear">Clear Map</button>
+            <p id="info">Draw a shape to choose your birth location.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Alex Thomas. Powered by OpenStreetMap and Leaflet. City data from Geonames.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
